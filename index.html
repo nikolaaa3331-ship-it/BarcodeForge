@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Генератор на баркодове</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Генератор на баркодове</h1>
+      <p class="subtitle">Създавайте професионални баркодове за търговия и продукти</p>
+    </header>
+
+    <!-- Индикатор за стъпки -->
+    <nav class="steps" aria-label="Стъпки">
+      <div class="step active" id="step-indicator-1">
+        <span class="step-number">1</span>
+        <span class="step-label">Избор на тип</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" id="step-indicator-2">
+        <span class="step-number">2</span>
+        <span class="step-label">Въвеждане</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" id="step-indicator-3">
+        <span class="step-number">3</span>
+        <span class="step-label">Експорт</span>
+      </div>
+    </nav>
+
+    <!-- Стъпка 1: Избор на тип -->
+    <section class="card" id="step-1">
+      <h2>Изберете тип баркод</h2>
+      <div class="type-grid">
+        <button class="type-card" data-type="EAN13">
+          <span class="type-icon">▐▌▌▐▌</span>
+          <strong>EAN-13</strong>
+          <small>13-цифрен европейски артикулен номер</small>
+        </button>
+        <button class="type-card" data-type="CODE128">
+          <span class="type-icon">▐▌▐▌▐</span>
+          <strong>Code 128</strong>
+          <small>Буквено-цифров — всички ASCII знаци</small>
+        </button>
+        <button class="type-card" data-type="QR">
+          <span class="type-icon">▣</span>
+          <strong>QR Code</strong>
+          <small>Текст, URL, информация за контакт…</small>
+        </button>
+        <button class="type-card" data-type="UPCA">
+          <span class="type-icon">▐▌▐▌▌</span>
+          <strong>UPC-A</strong>
+          <small>12-цифрен универсален продуктов код</small>
+        </button>
+      </div>
+    </section>
+
+    <!-- Стъпка 2: Въвеждане на данни -->
+    <section class="card hidden" id="step-2">
+      <h2>Въведете данни за баркода</h2>
+
+      <div id="field-EAN13" class="field-group hidden">
+        <label for="input-EAN13">Номер EAN-13 <span class="required">*</span></label>
+        <input type="text" id="input-EAN13" maxlength="13" placeholder="напр. 5901234123457"
+               inputmode="numeric" autocomplete="off" />
+        <p class="hint">Въведете точно 13 цифри. Последната цифра е контролна.</p>
+      </div>
+
+      <div id="field-CODE128" class="field-group hidden">
+        <label for="input-CODE128">Данни Code 128 <span class="required">*</span></label>
+        <input type="text" id="input-CODE128" placeholder="напр. PROD-0042-A"
+               autocomplete="off" />
+        <p class="hint">Всички печатни ASCII знаци (1–80 символа).</p>
+      </div>
+
+      <div id="field-QR" class="field-group hidden">
+        <label for="input-QR">Съдържание на QR Code <span class="required">*</span></label>
+        <textarea id="input-QR" rows="3" placeholder="https://example.com или произволен текст…"></textarea>
+        <p class="hint">Произволен текст или URL до ~2 900 знака.</p>
+      </div>
+
+      <div id="field-UPCA" class="field-group hidden">
+        <label for="input-UPCA">Номер UPC-A <span class="required">*</span></label>
+        <input type="text" id="input-UPCA" maxlength="12" placeholder="напр. 012345678905"
+               inputmode="numeric" autocomplete="off" />
+        <p class="hint">Въведете точно 12 цифри. Последната цифра е контролна.</p>
+      </div>
+
+      <div id="error-msg" class="error hidden" role="alert"></div>
+
+      <!-- Преглед в реално време -->
+      <div class="preview-area" id="preview-area">
+        <div id="barcode-placeholder">
+          <span>Прегледът на баркода ще се появи тук, докато пишете</span>
+        </div>
+        <div id="barcode-output" class="hidden">
+          <svg id="barcode-svg"></svg>
+          <div id="barcode-qr"></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="back-btn">← Назад</button>
+        <button class="btn btn-primary" id="next-btn" disabled>Напред → Експорт</button>
+      </div>
+    </section>
+
+    <!-- Стъпка 3: Експорт -->
+    <section class="card hidden" id="step-3">
+      <h2>Експортиране в PDF</h2>
+
+      <div class="field-group">
+        <label for="label-input">Етикет / Наименование на продукта <span class="optional">(незадължително)</span></label>
+        <input type="text" id="label-input" placeholder="напр. Премиум кафе на зърна 250г"
+               maxlength="80" autocomplete="off" />
+      </div>
+
+      <div class="export-preview">
+        <div id="export-barcode-output">
+          <svg id="export-barcode-svg"></svg>
+          <div id="export-barcode-qr"></div>
+        </div>
+        <p id="export-data-text" class="export-data-text"></p>
+        <p id="export-label-text" class="export-label-text"></p>
+      </div>
+
+      <div id="export-error" class="error hidden" role="alert"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="back-btn-2">← Назад</button>
+        <button class="btn btn-primary" id="export-btn">⬇ Изтегли PDF</button>
+        <button class="btn btn-reset" id="reset-btn">↺ Започни отначало</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- CDN библиотеки -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script src="js/generator.js"></script>
+  <script src="js/pdf-export.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
